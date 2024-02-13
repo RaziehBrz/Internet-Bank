@@ -15,6 +15,10 @@ namespace InternetBank.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<IdentityUserLogin<int>>().HasKey(login => new { login.LoginProvider, login.ProviderKey });
+            builder.Entity<IdentityUserRole<int>>().HasKey(p => new { p.UserId, p.RoleId });
+            builder.Entity<IdentityUserToken<int>>().HasKey(ut => new { ut.UserId, ut.LoginProvider, ut.Name });
+
             builder.Entity<Transaction>()
                    .HasOne(b => b.Account)
                    .WithMany(a => a.Transactions)
@@ -25,8 +29,5 @@ namespace InternetBank.Data
                    .WithMany(a => a.Accounts)
                    .HasForeignKey(b => b.UserId);
         }
-
-
-
     }
 }
