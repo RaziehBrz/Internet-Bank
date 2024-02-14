@@ -9,6 +9,7 @@ namespace InternetBank.Data
         public string Cvv2 { get; set; }
         public string ExpireDate { get; set; }
         public string StaticPassword { get; set; }
+        public int Amount { get; set; }
         public int Type { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
         public ICollection<Transaction> Transactions { get; set; }
