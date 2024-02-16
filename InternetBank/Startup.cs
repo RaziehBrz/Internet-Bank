@@ -6,6 +6,7 @@ using InternetBank.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,7 +30,13 @@ namespace InternetBank
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddDbContext<ApplicationDbConext>(options =>
+                    options.UseNpgsql(Configuration.GetConnectionString("ApplicationConnectionString")));
+
+            services.AddIdentity<ApplicationUser, IdentityRole<int>>()
+                    .AddEntityFrameworkStores<ApplicationDbConext>()
+                    .AddDefaultTokenProviders();
+
 
             services.AddAuthentication(option =>
             {
@@ -40,7 +47,7 @@ namespace InternetBank
             {
                 opt.SaveToken = true;
                 opt.RequireHttpsMetadata = false;
-                opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                opt.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -50,8 +57,13 @@ namespace InternetBank
                 };
             }
             );
-            services.AddDbContext<ApplicationDbConext>(options =>
-                     options.UseNpgsql(Configuration.GetConnectionString("ApplicationConnectionString")));
+
+            services.AddControllers();
+
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<IRandomService, RandomService>();
+
             services.AddSwaggerGen(c =>
 {
     // Define the Bearer token scheme
@@ -84,13 +96,6 @@ namespace InternetBank
 });
 
 
-            services.AddIdentity<ApplicationUser, IdentityRole<int>>()
-                    .AddEntityFrameworkStores<ApplicationDbConext>()
-                    .AddDefaultTokenProviders();
-            services.AddTransient<Random>();
-            services.AddTransient<IRandomNumberService, RandomNumberService>();
-            services.AddTransient<IUserRepository, UserRepository>();
-
 
         }
 
@@ -114,6 +119,7 @@ namespace InternetBank
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
