@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using InternetBank.Data;
@@ -6,6 +7,7 @@ using InternetBank.Models;
 using InternetBank.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace InternetBank.Repository
 {
@@ -39,6 +41,17 @@ namespace InternetBank.Repository
             _context.Account.Add(account);
             await _context.SaveChangesAsync();
             return account;
+        }
+
+        //Change Account static password
+        public async Task<bool> ChangePassword(ChangePasswordDto model)
+        {
+            var account = await _context.Account.Where(x => x.Id == model.AccountId).FirstOrDefaultAsync();
+            if (account is null) return false;
+
+            account.StaticPassword = model.NewPassword;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
