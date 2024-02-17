@@ -12,7 +12,11 @@ namespace InternetBank.Service
         public string AccountNumberGenerator(int type, int userId)
         {
             var firstPart = _random.Next(10, 100).ToString();
+
             var secondPart = userId.ToString();
+            if (secondPart.Length == 1) secondPart = "00" + secondPart;
+            else if (secondPart.Length == 2) secondPart = "0" + secondPart;
+
             var thirdPard = _random.Next(1000, 10000).ToString();
             var fourthPart = type.ToString();
 
