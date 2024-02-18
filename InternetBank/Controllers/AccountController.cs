@@ -42,17 +42,7 @@ namespace InternetBank.Controllers
             if (UserId != 0)
             {
                 var result = await _accountRepository.AddAccount(model, userId);
-                var responseDto = new
-                {
-                    result.Number,
-                    result.CardNumber,
-                    result.Cvv2,
-                    result.ExpireDate,
-                    result.StaticPassword,
-                    result.Id,
-                    result.Type
-                };
-                return Ok(responseDto);
+                return Ok(result);
             }
             return Unauthorized();
         }
@@ -60,7 +50,37 @@ namespace InternetBank.Controllers
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDto model)
         {
-
+            var result = await _accountRepository.ChangePassword(model);
+            if (result) return Ok("رمز ثابت حساب با موفقیت تغییر کرد!");
+            return BadRequest();
         }
+        [Authorize]
+        [HttpGet("balance/{account_id}")]
+        public async Task<IActionResult> GetAccountBalance(int account_id)
+        {
+            var result = await _accountRepository.GetAccountBalance(account_id);
+            if (result is null) return BadRequest();
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpPut("block/{account_id}")]
+        public async Task<IActionResult> BlockAccount(int account_id)
+        {
+            var result = await _accountRepository.BlockAccount(account_id);
+            if (!result) return BadRequest();
+            return Ok();
+        }
+        [Authorize]
+        [HttpPut("unblock/{account_id}")]
+        public async Task<IActionResult> UnBlockAccount(int account_id)
+        {
+            var result = await _accountRepository.UnBlockAccount(account_id);
+            if (!result) return BadRequest();
+            return Ok();
+        }
+
+
+
+
     }
 }
