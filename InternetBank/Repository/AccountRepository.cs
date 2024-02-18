@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using InternetBank.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace InternetBank.Repository
 {
@@ -23,7 +25,7 @@ namespace InternetBank.Repository
             _randomService = randomService;
         }
         //Create new Account
-        public async Task<Account> AddAccount(CreateAccountDto createAccountDto, int userId)
+        public async Task<AccountDetailsDto> AddAccount(CreateAccountDto createAccountDto, int userId)
         {
             var account = new Account()
             {
@@ -31,7 +33,7 @@ namespace InternetBank.Repository
                 Amount = createAccountDto.Amount,
                 CardNumber = _randomService.CardNumberGenerator(),
                 Cvv2 = _randomService.Cvv2Generator(),
-                ExpireDate = (DateTime.Now.Year + 5).ToString() + '/' + DateTime.Now.Month.ToString(),
+                ExpireDate = DateTime.Now.AddYears(5).ToString("yy/MM"),
                 StaticPassword = _randomService.PasswordGenerator(),
                 CreatedOn = DateTime.Now,
                 UserId = userId
@@ -40,7 +42,17 @@ namespace InternetBank.Repository
 
             _context.Account.Add(account);
             await _context.SaveChangesAsync();
-            return account;
+
+            return new AccountDetailsDto()
+            {
+                Number = account.Number,
+                CardNumber = account.CardNumber,
+                Cvv2 = account.Cvv2,
+                ExpireDate = account.ExpireDate,
+                StaticPassword = account.StaticPassword,
+                Id = account.Id,
+                Type = account.Type
+            };
         }
 
         //Change Account static password
@@ -50,6 +62,42 @@ namespace InternetBank.Repository
             if (account is null) return false;
 
             account.StaticPassword = model.NewPassword;
+            account.ModifiedOn = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        //Get account balance
+        public async Task<BalanceDetailsDto> GetAccountBalance(int accountId)
+        {
+            var account = await _context.Account.Where(x => x.Id == accountId).Select(x => new BalanceDetailsDto()
+            {
+                Amount = x.Amount,
+                AccountId = x.Id,
+                AccountNumber = x.Number
+            }).FirstOrDefaultAsync();
+
+            return account;
+        }
+        //Block account
+        public async Task<bool> BlockAccount(int id)
+        {
+            var account = await _context.Account.Where(x => x.Id == id)
+                                                .FirstOrDefaultAsync();
+            if (account is null) return false;
+
+            account.IsBlocked = true;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        //Unblock account
+        public async Task<bool> UnBlockAccount(int id)
+        {
+            var account = await _context.Account.Where(x => x.Id == id)
+                                                .FirstOrDefaultAsync();
+            if (account is null) return false;
+
+            account.IsBlocked = false;
             await _context.SaveChangesAsync();
             return true;
         }

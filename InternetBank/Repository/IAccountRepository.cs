@@ -6,7 +6,10 @@ namespace InternetBank.Repository
 {
     public interface IAccountRepository
     {
-        Task<Account> AddAccount(CreateAccountDto createAccountDto, int userId);
+        Task<AccountDetailsDto> AddAccount(CreateAccountDto createAccountDto, int userId);
         Task<bool> ChangePassword(ChangePasswordDto model);
+        Task<BalanceDetailsDto> GetAccountBalance(int accountId);
+        Task<bool> BlockAccount(int id);
+        Task<bool> UnBlockAccount(int id);
     }
 }
