@@ -41,6 +41,9 @@ namespace InternetBank.Migrations
                     b.Property<string>("ExpireDate")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
