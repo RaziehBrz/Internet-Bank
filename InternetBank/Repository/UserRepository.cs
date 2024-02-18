@@ -34,10 +34,13 @@ namespace InternetBank.Repository
                 FirstName = signUpDto.FirstName,
                 LastName = signUpDto.LastName,
                 Email = signUpDto.Email,
+                BirthDate = signUpDto.BirthDate.Date,
+                NationalCode = signUpDto.NationalCode,
                 UserName = signUpDto.Email
             };
             return await _userManager.CreateAsync(user, signUpDto.Password);
         }
+
         public async Task<string> Login(LoginDto loginDto)
         {
             var result = await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, false, false);
