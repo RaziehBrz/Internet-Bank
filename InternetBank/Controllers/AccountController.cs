@@ -78,9 +78,13 @@ namespace InternetBank.Controllers
             if (!result) return BadRequest();
             return Ok();
         }
-
-
-
-
+        //Get all accounts
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAllAccounts()
+        {
+            var result = await _accountRepository.GetAllAccounts(UserId);
+            return Ok(result);
+        }
     }
 }

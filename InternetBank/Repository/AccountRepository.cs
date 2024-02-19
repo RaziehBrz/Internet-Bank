@@ -101,5 +101,18 @@ namespace InternetBank.Repository
             await _context.SaveChangesAsync();
             return true;
         }
+        //Get all accounts
+        public async Task<List<AccountDto>> GetAllAccounts(int userId)
+        {
+            var accounts = await _context.Account.Where(x => x.UserId == userId).Select(x =>
+            new AccountDto()
+            {
+                Number = x.Number,
+                Id = x.Id,
+                CardNumber = x.CardNumber
+            }).ToListAsync();
+
+            return accounts;
+        }
     }
 }

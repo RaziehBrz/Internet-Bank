@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using InternetBank.Data;
 using InternetBank.Models;
@@ -11,5 +12,6 @@ namespace InternetBank.Repository
         Task<BalanceDetailsDto> GetAccountBalance(int accountId);
         Task<bool> BlockAccount(int id);
         Task<bool> UnBlockAccount(int id);
+        Task<List<AccountDto>> GetAllAccounts(int userId);
     }
 }
