@@ -56,9 +56,9 @@ namespace InternetBank.Repository
         }
 
         //Change Account static password
-        public async Task<bool> ChangePassword(ChangePasswordDto model)
+        public async Task<bool> ChangePassword(ChangePasswordDto model, int userId)
         {
-            var account = await _context.Account.Where(x => x.Id == model.AccountId).FirstOrDefaultAsync();
+            var account = await _context.Account.Where(x => x.Id == model.AccountId && x.UserId == userId).FirstOrDefaultAsync();
             if (account is null) return false;
 
             account.StaticPassword = model.NewPassword;
@@ -68,9 +68,10 @@ namespace InternetBank.Repository
         }
 
         //Get account balance
-        public async Task<BalanceDetailsDto> GetAccountBalance(int accountId)
+        public async Task<BalanceDetailsDto> GetAccountBalance(int accountId, int userId)
         {
-            var account = await _context.Account.Where(x => x.Id == accountId).Select(x => new BalanceDetailsDto()
+            var account = await _context.Account.Where(x => x.Id == accountId && x.UserId == userId)
+            .Select(x => new BalanceDetailsDto()
             {
                 Amount = x.Amount,
                 AccountId = x.Id,
@@ -80,9 +81,9 @@ namespace InternetBank.Repository
             return account;
         }
         //Block account
-        public async Task<bool> BlockAccount(int id)
+        public async Task<bool> BlockAccount(int id, int userId)
         {
-            var account = await _context.Account.Where(x => x.Id == id)
+            var account = await _context.Account.Where(x => x.Id == id && x.UserId == userId)
                                                 .FirstOrDefaultAsync();
             if (account is null) return false;
 
@@ -91,9 +92,9 @@ namespace InternetBank.Repository
             return true;
         }
         //Unblock account
-        public async Task<bool> UnBlockAccount(int id)
+        public async Task<bool> UnBlockAccount(int id, int userId)
         {
-            var account = await _context.Account.Where(x => x.Id == id)
+            var account = await _context.Account.Where(x => x.Id == id && x.UserId == userId)
                                                 .FirstOrDefaultAsync();
             if (account is null) return false;
 
@@ -104,15 +105,28 @@ namespace InternetBank.Repository
         //Get all accounts
         public async Task<List<AccountDto>> GetAllAccounts(int userId)
         {
-            var accounts = await _context.Account.Where(x => x.UserId == userId).Select(x =>
+            return await _context.Account.Where(x => x.UserId == userId && x.UserId == userId).Select(x =>
             new AccountDto()
             {
                 Number = x.Number,
                 Id = x.Id,
                 CardNumber = x.CardNumber
             }).ToListAsync();
-
-            return accounts;
+        }
+        //Get an account by id
+        public async Task<AccountDetailsDto> GetAccountById(int id, int userId)
+        {
+            return await _context.Account.Where(x => x.Id == id && x.UserId == userId)
+                                                .Select(x => new AccountDetailsDto()
+                                                {
+                                                    Number = x.Number,
+                                                    CardNumber = x.CardNumber,
+                                                    Cvv2 = x.Cvv2,
+                                                    ExpireDate = x.ExpireDate,
+                                                    StaticPassword = x.StaticPassword,
+                                                    Id = x.Id,
+                                                    Type = x.Type
+                                                }).FirstOrDefaultAsync();
         }
     }
 }
