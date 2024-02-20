@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using InternetBank.Data;
 using InternetBank.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -46,10 +48,13 @@ namespace InternetBank.Repository
             var result = await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, false, false);
             if (!result.Succeeded) return null;
 
+            var user = await _userManager.Users.Where(x => x.Email == loginDto.Email).FirstOrDefaultAsync();
+
             var authClaims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Email , loginDto.Email) ,
-                new Claim(JwtRegisteredClaimNames.Jti , Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Email, loginDto.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var authSignInKey = new SymmetricSecurityKey(Encoding.UTF8
