@@ -30,11 +30,11 @@ namespace InternetBank
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbConext>(options =>
+            services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseNpgsql(Configuration.GetConnectionString("ApplicationConnectionString")));
 
             services.AddIdentity<ApplicationUser, IdentityRole<int>>()
-                    .AddEntityFrameworkStores<ApplicationDbConext>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
 
 
@@ -62,6 +62,7 @@ namespace InternetBank
 
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<ITransactionRepository, TransactionRepository>();
             services.AddTransient<IRandomService, RandomService>();
 
             services.AddSwaggerGen(c =>
