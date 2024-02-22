@@ -15,10 +15,10 @@ namespace InternetBank.Repository
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly ApplicationDbConext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IRandomService _randomService;
         public AccountRepository(
-            ApplicationDbConext context,
+            ApplicationDbContext context,
             IRandomService randomService)
         {
             _context = context;
