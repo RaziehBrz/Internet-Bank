@@ -1,18 +1,19 @@
 using System.ComponentModel.DataAnnotations;
-using DNTPersianUtils.Core;
+using InternetBank.Validations;
 
 namespace InternetBank.Models
 {
     public class SendOtpDto
     {
-        [ValidIranShetabNumber]
+        [IsValidCardNumber]
         public string SourceCardNumber { get; set; }
-        [MinLength(4)]
+        [IsValidCvv2]
         public string Cvv2 { get; set; }
+        [IsValidExpireDate]
         public string ExpireDate { get; set; }
         [Range(1000, 5000000)]
         public int Amount { get; set; }
-        [ValidIranShetabNumber]
+        [IsValidCardNumber]
         public string DestinationCardNumber { get; set; }
     }
 }
