@@ -25,7 +25,7 @@ namespace InternetBank.Service
         public string CardNumberGenerator()
         {
             var cardNumber = "";
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
                 cardNumber += _random.Next(1000, 10000).ToString();
             }
