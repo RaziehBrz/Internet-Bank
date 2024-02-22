@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InternetBank.Data
 {
-    public class ApplicationDbConext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
         public DbSet<ApplicationUser> User { get; set; }
         public DbSet<Account> Account { get; set; }
         public DbSet<Transaction> Transaction { get; set; }
-        public ApplicationDbConext(DbContextOptions<ApplicationDbConext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
