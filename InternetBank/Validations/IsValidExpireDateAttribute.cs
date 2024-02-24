@@ -11,7 +11,7 @@ namespace InternetBank.Validations
             {
                 DateTime result;
                 DateTime.TryParse(expireDate, out result);
-                if (result <= DateTime.Now) return true;
+                if (result >= DateTime.Now) return true;
             }
             return false;
         }
