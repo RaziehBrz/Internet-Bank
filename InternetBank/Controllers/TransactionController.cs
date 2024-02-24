@@ -12,6 +12,13 @@ namespace InternetBank.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionRepository _transactionRepository;
+        public int UserId
+        {
+            get
+            {
+                return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+        }
         public TransactionController(ITransactionRepository transactionRepository)
         {
             _transactionRepository = transactionRepository;
@@ -24,6 +31,14 @@ namespace InternetBank.Controllers
             var result = await _transactionRepository.SendOtp(model, userId);
             if (result == 0) return BadRequest();
             return Ok(result);
+        }
+        [Authorize]
+        [HttpPatch("transfer-money")]
+        public async Task<IActionResult> TransferMoney(TransferMoneyDto model)
+        {
+            var result = await _transactionRepository.TransferMoney(model, UserId);
+            if (!result) return BadRequest("انتقال پول ناموفق!");
+            return Ok("انتقال پول با موفقیت انجام شد!");
         }
 
 

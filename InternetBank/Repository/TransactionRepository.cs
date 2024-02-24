@@ -44,12 +44,45 @@ namespace InternetBank.Repository
                 AccountId = account.Id,
                 DestinationCardNumber = model.DestinationCardNumber,
                 Amount = model.Amount,
-                Otp = dynamicPass
+                Otp = dynamicPass,
+                UserId = user.Id,
+                CreatedOn = DateTime.Now
             };
             _context.Transaction.Add(transaction);
             await _context.SaveChangesAsync();
 
             return transaction.Id;
+        }
+        public async Task<bool> TransferMoney(TransferMoneyDto model, int UserId)
+        {
+            var transaction = await _context.Transaction.Where(x => x.Otp == model.Otp
+                                                               && x.Amount == model.Amount
+                                                               && x.UserId == UserId
+                                                               ).FirstOrDefaultAsync();
+            var account = await _context.Account.Where(x => x.Id == transaction.AccountId).FirstOrDefaultAsync();
+            if (transaction is null)
+            {
+                transaction.Description = "عدم تطابق اطلاعات با مرحله اول انتقال پول";
+                transaction.Status = false;
+                return false;
+            }
+            if (transaction.Amount > account.Amount)
+            {
+                transaction.Description = "عدم موجودی کافی";
+                transaction.Status = false;
+                return false;
+            }
+
+            var destinationAccount = await _context.Account.Where(x => x.CardNumber == transaction.DestinationCardNumber)
+                                                     .FirstOrDefaultAsync();
+
+            if (!(destinationAccount is null))
+            {
+                destinationAccount.Amount += transaction.Amount;
+            }
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
     }
