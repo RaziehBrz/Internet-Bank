@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DNTPersianUtils.Core;
@@ -73,6 +74,7 @@ namespace InternetBank.Repository
                 return false;
             }
 
+            transaction.Status = true;
             var destinationAccount = await _context.Account.Where(x => x.CardNumber == transaction.DestinationCardNumber)
                                                      .FirstOrDefaultAsync();
 
@@ -83,6 +85,24 @@ namespace InternetBank.Repository
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<List<TransactionDetailsDto>> GetTransactions(string from, string to, bool isSuccess, int userId)
+        {
+            return await _context.Transaction.Where(x => x.UserId == userId
+                                                    && x.CreatedOn >= DateTime.Parse(from)
+                                                    && x.CreatedOn <= DateTime.Parse(to)
+                                                    && x.Status == isSuccess)
+                                                    .Take(5).Select(x =>
+                                                            new TransactionDetailsDto()
+                                                            {
+                                                                Amount = x.Amount,
+                                                                Status = x.Status,
+                                                                CreatedOn = x.CreatedOn,
+                                                                AccountId = x.AccountId,
+                                                                Description = x.Description,
+                                                                DestinationCardNumber = x.DestinationCardNumber
+                                                            }).ToListAsync();
         }
 
     }

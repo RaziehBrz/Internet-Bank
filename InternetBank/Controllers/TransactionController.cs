@@ -40,7 +40,12 @@ namespace InternetBank.Controllers
             if (!result) return BadRequest("انتقال پول ناموفق!");
             return Ok("انتقال پول با موفقیت انجام شد!");
         }
-
-
+        [Authorize]
+        [HttpGet("report")]
+        public async Task<IActionResult> GetTransactions(string from, string to, bool isSuccess)
+        {
+            var result = await _transactionRepository.GetTransactions(from, to, isSuccess, UserId);
+            return Ok(result);
+        }
     }
 }
