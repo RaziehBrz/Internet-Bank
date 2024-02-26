@@ -58,7 +58,8 @@ namespace InternetBank.Repository
         //Change Account static password
         public async Task<bool> ChangePassword(ChangePasswordDto model, int userId)
         {
-            var account = await _context.Account.Where(x => x.Id == model.AccountId && x.UserId == userId).FirstOrDefaultAsync();
+            var account = await _context.Account.Where(x => x.Id == model.AccountId && x.UserId == userId)
+                                                .FirstOrDefaultAsync();
             if (account is null) return false;
 
             account.StaticPassword = model.NewPassword;
